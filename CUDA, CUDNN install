@@ -1,0 +1,24 @@
+To work in Deep Learning using System GPU, you have to download and install CUDA and CUDNN.
+I have download CUDA 11.2  and CUDNN xxx should be compatible with the installed CUDA version. (You can check the compatibility of CUDNN from the website).
+(CUDA toolkit download link- https://developer.nvidia.com/cuda-11.2.0-download-archive?target_os=Windows&target_arch=x86_64)
+(CUDNN download link- https://developer.nvidia.com/cudnn-downloads)
+After downloading the CUDNN zip, extract the folder and paste all the folder in CUDA respective folder of CUDA. 
+Copy folder Lib, Include etc. from CUDNN and paste the same in CUDA lib, include etc. folder.
+Then go to Environment variables and edit ,paste the path of CUDA BIN, LIB path.
+Download and install Visual studio community and must select Desktop Development with C++, Data Science and Analytical Applications,MSVC v143 - VS 2022 C++ x64/x86 build tools,C++ CMake tools for Windows,Windows 10/11 SDK,
+Then ..
+Restart the system and open VS code
+Connect to your environment 
+conda activate <your-environment-name>
+then run the following code
+python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
+python -c "import torch; print(torch.cuda.is_available())"
+
+import tensorflow as tf
+print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+
+Note: for tensorflow use the version 10.2 only. This version only use the system gpu.
+for py torch
+import torch
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Using device:", device)
