@@ -1,0 +1,76 @@
+%pip install kaggle
+!kaggle datasets download -d erhmrai/ecg-image-data --force
+import zipfile
+import os
+
+# Define the path to your zip file and the extraction path
+zip_file_path = r'D:\documents backup\paper journal\dl paper\dataset\ecg-image-data.zip'  # Change this to the correct path
+extract_to_path = r'D:\documents backup\paper journal\dl paper\dataset'  # Change this to where you want the files extracted
+
+# Unzip the file
+with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+    zip_ref.extractall(extract_to_path)
+
+print(f"Files unzipped successfully to {extract_to_path}")
+import os
+import shutil
+
+# Define the paths for training and testing directories
+train_dir = r'D:\documents backup\paper journal\dl paper\dataset\ecg-image-data\ECG_Image_data\train'  # Change to your actual training folder path
+test_dir = r'D:\documents backup\paper journal\dl paper\dataset\ecg-image-data\ECG_Image_data\test'    # Change to your actual testing folder path
+
+# Define the new directories for merged abnormal and normal samples
+train_abnormal_dir = r'D:\documents backup\paper journal\dl paper\dataset\ecg-image-data\ECG_Image_data\train\abnormal'  # Merged abnormal training folder
+train_normal_dir = r'D:\documents backup\paper journal\dl paper\dataset\ecg-image-data\ECG_Image_data\train\N'      # Merged normal training folder
+
+test_abnormal_dir = r'D:\documents backup\paper journal\dl paper\dataset\ecg-image-data\ECG_Image_data\test\abnormal'    # Merged abnormal testing folder
+test_normal_dir = r'D:\documents backup\paper journal\dl paper\dataset\ecg-image-data\ECG_Image_data\test\N'        # Merged normal testing folder
+
+# Ensure directories exist (create if not)
+os.makedirs(train_abnormal_dir, exist_ok=True)
+os.makedirs(train_normal_dir, exist_ok=True)
+os.makedirs(test_abnormal_dir, exist_ok=True)
+os.makedirs(test_normal_dir, exist_ok=True)
+
+# Define abnormal class folders
+abnormal_classes = ['M', 'F', 'Q', 'S', 'V']  # Replace with your abnormal class names
+normal_class = 'N'  # Replace with your normal class folder name
+
+# Function to merge abnormal and normal samples
+def merge_samples(source_dir, dest_abnormal, dest_normal, abnormal_classes, normal_class):
+    # Set to track copied filenames to prevent duplicates
+    copied_files = set()
+
+    # Merge abnormal class samples
+    for abnormal_class in abnormal_classes:
+        class_dir = os.path.join(source_dir, abnormal_class)
+        if os.path.exists(class_dir):
+            for file_name in os.listdir(class_dir):
+                src_file = os.path.join(class_dir, file_name)
+                dest_file = os.path.join(dest_abnormal, file_name)
+                if not os.path.exists(dest_file):  # Check for duplicates
+                    shutil.copy(src_file, dest_abnormal)
+                    copied_files.add(file_name)  # Mark as copied
+                else:
+                    print(f"File already exists and skipped: {file_name}")
+
+    # Merge normal class samples
+    normal_dir = os.path.join(source_dir, normal_class)
+    if os.path.exists(normal_dir):
+        for file_name in os.listdir(normal_dir):
+            src_file = os.path.join(normal_dir, file_name)
+            dest_file = os.path.join(dest_normal, file_name)
+            if not os.path.exists(dest_file):  # Check for duplicates
+                shutil.copy(src_file, dest_normal)
+                copied_files.add(file_name)  # Mark as copied
+            else:
+                print(f"File already exists and skipped: {file_name}")
+
+# Merge training samples
+merge_samples(train_dir, train_abnormal_dir, train_normal_dir, abnormal_classes, normal_class)
+
+# Merge testing samples
+merge_samples(test_dir, test_abnormal_dir, test_normal_dir, abnormal_classes, normal_class)
+
+print("Samples merged successfully!")
+    
